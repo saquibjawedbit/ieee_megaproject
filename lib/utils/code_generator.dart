@@ -13,10 +13,21 @@ class CodeGenerator {
     code.writeln('    return MaterialApp(');
     code.writeln('      debugShowCheckedModeBanner: false,');
     code.writeln('      theme: ThemeData(useMaterial3: true),');
-    code.writeln('      home: ${_generateWidgetTree(nodes)},');
+    code.writeln('      home: MyApp(),');
     code.writeln('    );');
     code.writeln('  }');
     code.writeln('}');
+
+    code.writeln('class MyApp extends StatelessWidget {');
+    code.writeln('  const MyApp({super.key});');
+    code.writeln(' @override');
+    code.writeln('  Widget build(BuildContext context) {');
+    code.writeln('    return Scaffold(');
+    code.writeln('      body: ${_generateWidgetTree(nodes)},');
+    code.writeln('    );');
+    code.writeln(' }');
+    code.writeln('}');
+
     return code.toString();
   }
 

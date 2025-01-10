@@ -4,10 +4,15 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../controllers/hierarchy_controller.dart';
 import '../models/widget_node.dart';
 
-class InspectorPanel extends StatelessWidget {
-  final controller = Get.find<HierarchyController>();
+class InspectorPanel extends StatefulWidget {
+  const InspectorPanel({super.key});
 
-  InspectorPanel({super.key});
+  @override
+  State<InspectorPanel> createState() => _InspectorPanelState();
+}
+
+class _InspectorPanelState extends State<InspectorPanel> {
+  final controller = Get.find<HierarchyController>();
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +116,20 @@ class InspectorPanel extends StatelessWidget {
   }
 
   Widget _buildTextInput(WidgetNode node) {
+    final Map<String, FontWeight> weightMap = {
+      'w100': FontWeight.w100,
+      'w200': FontWeight.w200,
+      'w300': FontWeight.w300,
+      'w400': FontWeight.w400,
+      'w500': FontWeight.w500,
+      'w600': FontWeight.w600,
+      'w700': FontWeight.w700,
+      'w800': FontWeight.w800,
+      'w900': FontWeight.w900,
+      'normal': FontWeight.normal,
+      'bold': FontWeight.bold,
+    };
+
     return Column(
       children: [
         GetBuilder<HierarchyController>(
@@ -136,8 +155,88 @@ class InspectorPanel extends StatelessWidget {
             },
           ),
         ),
+        GetBuilder<HierarchyController>(
+          builder: (controller) => _buildDropdown(
+            'Font Weight',
+            _getFontWeightValue(node.fontWeight.value),
+            weightMap.keys.toList(),
+            (newValue) {
+              if (newValue != null) {
+                final weight = weightMap[newValue] ?? FontWeight.normal;
+                controller.updateFontWeight(node, weight);
+              }
+              setState(() {});
+            },
+          ),
+        ),
+        // Add color picker for text
+        GetBuilder<HierarchyController>(
+          builder: (controller) => _buildColorPicker(
+            'Text Color',
+            node.color.value,
+            (newColor) {
+              controller.updateNodeColor(node, newColor);
+            },
+          ),
+        ),
       ],
     );
+  }
+
+  String _getFontWeightValue(FontWeight weight) {
+    switch (weight) {
+      case FontWeight.w100:
+        return 'w100';
+      case FontWeight.w200:
+        return 'w200';
+      case FontWeight.w300:
+        return 'w300';
+      case FontWeight.w400:
+        return 'w400';
+      case FontWeight.w500:
+        return 'w500';
+      case FontWeight.w600:
+        return 'w600';
+      case FontWeight.w700:
+        return 'w700';
+      case FontWeight.w800:
+        return 'w800';
+      case FontWeight.w900:
+        return 'w900';
+      case FontWeight.bold:
+        return 'bold';
+      case FontWeight.normal:
+      default:
+        return 'normal';
+    }
+  }
+
+  FontWeight _parseFontWeight(String value) {
+    switch (value) {
+      case 'w100':
+        return FontWeight.w100;
+      case 'w200':
+        return FontWeight.w200;
+      case 'w300':
+        return FontWeight.w300;
+      case 'w400':
+        return FontWeight.w400;
+      case 'w500':
+        return FontWeight.w500;
+      case 'w600':
+        return FontWeight.w600;
+      case 'w700':
+        return FontWeight.w700;
+      case 'w800':
+        return FontWeight.w800;
+      case 'w900':
+        return FontWeight.w900;
+      case 'bold':
+        return FontWeight.bold;
+      case 'normal':
+      default:
+        return FontWeight.normal;
+    }
   }
 
   Widget _buildAlignmentInputs(WidgetNode node) {

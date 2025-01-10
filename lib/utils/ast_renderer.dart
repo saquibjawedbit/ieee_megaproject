@@ -17,9 +17,7 @@ class AstRenderer {
     import 'package:flutter/material.dart';
     
     Widget build() {
-      return Scafffold(
-        body:${_generateWidgetTree(node)},
-      );
+      return ${_generateWidgetTree(node)};
     }
     ''';
   }
@@ -42,7 +40,8 @@ class AstRenderer {
           '${node.content.value}',
           style: TextStyle(
             fontSize: ${node.fontSize.value},
-            color: ${node.color.value},
+            color: Color(0x${node.color.value.value.toRadixString(16).padLeft(8, '0')}),
+            fontWeight: ${_getFontWeightString(node.fontWeight.value)},
           ),
         )''';
 
@@ -66,6 +65,34 @@ class AstRenderer {
 
       default:
         return 'Container()';
+    }
+  }
+
+  static String _getFontWeightString(FontWeight weight) {
+    switch (weight) {
+      case FontWeight.w100:
+        return 'FontWeight.w100';
+      case FontWeight.w200:
+        return 'FontWeight.w200';
+      case FontWeight.w300:
+        return 'FontWeight.w300';
+      case FontWeight.w400:
+        return 'FontWeight.w400';
+      case FontWeight.w500:
+        return 'FontWeight.w500';
+      case FontWeight.w600:
+        return 'FontWeight.w600';
+      case FontWeight.w700:
+        return 'FontWeight.w700';
+      case FontWeight.w800:
+        return 'FontWeight.w800';
+      case FontWeight.w900:
+        return 'FontWeight.w900';
+      case FontWeight.bold:
+        return 'FontWeight.bold';
+      case FontWeight.normal:
+      default:
+        return 'FontWeight.normal';
     }
   }
 
@@ -108,7 +135,8 @@ class AstRenderer {
             node.content.value,
             style: TextStyle(
               fontSize: node.fontSize.value,
-              color: node.color.value,
+              color: node.color.value, // Use the color property
+              fontWeight: node.fontWeight.value, // Add this line
             ),
           );
 

@@ -17,6 +17,7 @@ class WidgetNode {
   final Rx<Color> color = Colors.blue.withOpacity(0.3).obs;
   final RxString content = 'Text Widget'.obs;
   final RxDouble fontSize = 14.0.obs;
+  final Rx<FontWeight> fontWeight = FontWeight.normal.obs; // Add this line
   final Rx<MainAxisAlignment> mainAxisAlignment = MainAxisAlignment.start.obs;
   final Rx<CrossAxisAlignment> crossAxisAlignment =
       CrossAxisAlignment.center.obs;

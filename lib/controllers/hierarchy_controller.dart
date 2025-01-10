@@ -147,6 +147,11 @@ class HierarchyController extends GetxController {
     nodes.refresh();
   }
 
+  void updateFontWeight(WidgetNode node, FontWeight weight) {
+    node.fontWeight.value = weight;
+    nodes.refresh();
+  }
+
   void updateAlignment(
     WidgetNode node, {
     MainAxisAlignment? main,
