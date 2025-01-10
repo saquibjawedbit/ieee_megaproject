@@ -112,7 +112,7 @@ class AstRenderer {
           return const SizedBox();
       }
     } catch (e) {
-      print('Error rendering widget: $e');
+      debugPrint('Error rendering widget: $e');
       return const SizedBox();
     }
   }
