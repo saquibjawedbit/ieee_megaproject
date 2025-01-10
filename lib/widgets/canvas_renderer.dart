@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../controllers/hierarchy_controller.dart';
 import '../models/widget_node.dart';
 import '../utils/code_generator.dart';
+import '../utils/ast_renderer.dart';
 
 class CanvasRenderer extends StatelessWidget {
   final controller = Get.find<HierarchyController>();
@@ -103,84 +104,12 @@ class CanvasRenderer extends StatelessWidget {
 
   Widget _renderWidget(WidgetNode node) {
     Widget child;
-    switch (node.type) {
-      case 'Container':
-        child = Container(
-          width: node.width.value,
-          height: node.height.value,
-          decoration: BoxDecoration(
-            color: node.color.value,
-            border: Border.all(
-              color: controller.selected.value?.id == node.id
-                  ? Colors.blue
-                  : Colors.grey[600]!,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: node.children.isEmpty
-              ? null
-              : Stack(
-                  clipBehavior: Clip.none,
-                  children: node.children.map(_renderWidget).toList(),
-                ),
-        );
-        break;
-
-      case 'Text':
-        child = Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: controller.selected.value?.id == node.id
-                    ? Colors.blue
-                    : Colors.transparent,
-              ),
-            ),
-            child: Text(
-              node.content.value,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: node.fontSize.value,
-              ),
-            ),
-          ),
-        );
-        break;
-
-      case 'Row':
-      case 'Column':
-        final isRow = node.type == 'Row';
-        child = Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: controller.selected.value?.id == node.id
-                    ? Colors.blue
-                    : Colors.grey[600]!.withOpacity(0.3),
-              ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: isRow
-                ? Row(
-                    mainAxisAlignment: node.mainAxisAlignment.value,
-                    crossAxisAlignment: node.crossAxisAlignment.value,
-                    children: node.children.map(_renderWidget).toList(),
-                  )
-                : Column(
-                    mainAxisAlignment: node.mainAxisAlignment.value,
-                    crossAxisAlignment: node.crossAxisAlignment.value,
-                    children: node.children.map(_renderWidget).toList(),
-                  ),
-          ),
-        );
-        break;
-
-      default:
-        child = const SizedBox();
+    try {
+      // Use AST renderer
+      child = AstRenderer.renderFromNode(node);
+    } catch (e) {
+      print('Error rendering widget: $e');
+      child = const SizedBox();
     }
 
     return Positioned(
@@ -197,7 +126,19 @@ class CanvasRenderer extends StatelessWidget {
               node.y.value + details.delta.dy,
             );
           },
-          child: child,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: controller.selected.value?.id == node.id
+                      ? Colors.blue
+                      : Colors.transparent,
+                ),
+              ),
+              child: child,
+            ),
+          ),
         ),
       ),
     );
