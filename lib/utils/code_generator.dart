@@ -21,24 +21,18 @@ class CodeGenerator {
   }
 
   static String _generateWidgetTree(List<WidgetNode> nodes) {
-    if (nodes.isEmpty) return 'const Scaffold()';
+    if (nodes.isEmpty) return 'Placeholder()';
 
-    // Find Scaffold if it exists
-    final scaffoldNode = nodes.firstWhere(
-      (node) => node.type == 'Scaffold',
-      orElse: () => nodes.first,
-    );
-
-    return _generateWidget(scaffoldNode);
+    return _generateWidget(nodes.first);
   }
 
   static String _generateWidget(WidgetNode node) {
     switch (node.type) {
       case 'Scaffold':
         return '''Scaffold(
-          appBar: AppBar(title: const Text('Generated App')),
-          body: SafeArea(
-            child: ${_generateChildren(node.children)},
+          body: Container(
+            color: Colors.white,
+            child: ${node.children.isEmpty ? 'const Center(child: Text("Add widgets here"))' : _generateChildren(node.children)},
           ),
         )''';
 

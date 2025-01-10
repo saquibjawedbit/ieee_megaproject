@@ -17,7 +17,9 @@ class AstRenderer {
     import 'package:flutter/material.dart';
     
     Widget build() {
-      return ${_generateWidgetTree(node)};
+      return Scafffold(
+        body:${_generateWidgetTree(node)},
+      );
     }
     ''';
   }
@@ -40,7 +42,7 @@ class AstRenderer {
           '${node.content.value}',
           style: TextStyle(
             fontSize: ${node.fontSize.value},
-            color: Colors.white,
+            color: ${node.color.value},
           ),
         )''';
 
@@ -70,6 +72,24 @@ class AstRenderer {
   static Widget _renderAst(CompilationUnit unit, WidgetNode node) {
     try {
       switch (node.type) {
+        // case 'Scaffold':
+        //   return Scaffold(
+        //     appBar: AppBar(
+        //       title: const Text('Preview'),
+        //     ),
+        //     body: Container(
+        //       color: Colors.white,
+        //       child: node.children.isEmpty
+        //           ? const Center(child: Text('Add widgets here'))
+        //           : Stack(
+        //               fit: StackFit.expand,
+        //               children: node.children
+        //                   .map((child) => _renderAst(unit, child))
+        //                   .toList(),
+        //             ),
+        //     ),
+        //   );
+
         case 'Container':
           return Container(
             width: node.width.value,
@@ -88,7 +108,7 @@ class AstRenderer {
             node.content.value,
             style: TextStyle(
               fontSize: node.fontSize.value,
-              color: Colors.white,
+              color: node.color.value,
             ),
           );
 

@@ -45,22 +45,29 @@ class CanvasRenderer extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.black87,
                 borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: Colors.grey[850]!, width: 12),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black,
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
                 ],
               ),
               child: AspectRatio(
-                aspectRatio: 9 / 16, // Mobile screen ratio
+                aspectRatio: 9 / 20, // Mobile screen ratio
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    color: Colors.grey[900],
-                    child: Obx(() => _buildPreview()),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      // image: const DecorationImage(
+                      //   // image: AssetImage('assets/frame.png'),
+                      //   fit: BoxFit.fill,
+                      // ),
+                    ),
+                    child: Obx(
+                      () => _buildPreview(),
+                    ),
                   ),
                 ),
               ),
@@ -73,7 +80,7 @@ class CanvasRenderer extends StatelessWidget {
 
   Widget _buildPreview() {
     return Container(
-      color: Colors.grey[850],
+      color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: InteractiveViewer(
         boundaryMargin: const EdgeInsets.all(double.infinity),
@@ -85,11 +92,6 @@ class CanvasRenderer extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // Grid background
-              CustomPaint(
-                size: const Size(1000, 2000),
-                painter: GridPainter(),
-              ),
               // Widgets
               ...controller.nodes.map((node) => _renderWidget(node)),
               // Selection overlay
@@ -108,7 +110,7 @@ class CanvasRenderer extends StatelessWidget {
       // Use AST renderer
       child = AstRenderer.renderFromNode(node);
     } catch (e) {
-      print('Error rendering widget: $e');
+      debugPrint('Error rendering widget: $e');
       child = const SizedBox();
     }
 
@@ -150,8 +152,6 @@ class CanvasRenderer extends StatelessWidget {
       top: node.y.value,
       child: IgnorePointer(
         child: Container(
-          width: node.width.value,
-          height: node.height.value,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.blue, width: 2),
             borderRadius: BorderRadius.circular(8),
@@ -160,24 +160,4 @@ class CanvasRenderer extends StatelessWidget {
       ),
     );
   }
-}
-
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey[800]!.withOpacity(0.2)
-      ..strokeWidth = 1;
-
-    const spacing = 20.0;
-    for (var i = 0.0; i < size.width; i += spacing) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
-    }
-    for (var i = 0.0; i < size.height; i += spacing) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

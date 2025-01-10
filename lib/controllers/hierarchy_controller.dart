@@ -35,11 +35,12 @@ class HierarchyController extends GetxController {
       case 'Container':
         newNode.width.value = 200;
         newNode.height.value = 200;
-        newNode.color.value = Colors.blue.withOpacity(0.3);
+        newNode.color.value = const Color.fromARGB(255, 39, 138, 220);
         break;
       case 'Text':
         newNode.content.value = 'New Text';
         newNode.fontSize.value = 16;
+        newNode.color.value = const Color.fromARGB(255, 11, 11, 11);
         break;
       case 'Row':
       case 'Column':
