@@ -1,0 +1,28 @@
+^C:\USERS\BIT\DOCUMENTS\FLUTTER_PROJECTS\IEEE_MEGAPROJECT\BUILD\WINDOWS\X64\CMAKEFILES\2A831D380BBD5E17D5A14471F43D3BDA\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=C:\src\flutter PROJECT_DIR=C:\Users\BIT\Documents\flutter_projects\ieee_megaproject FLUTTER_ROOT=C:\src\flutter FLUTTER_EPHEMERAL_DIR=C:\Users\BIT\Documents\flutter_projects\ieee_megaproject\windows\flutter\ephemeral PROJECT_DIR=C:\Users\BIT\Documents\flutter_projects\ieee_megaproject FLUTTER_TARGET=C:\Users\BIT\Documents\flutter_projects\ieee_megaproject\lib\main.dart DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=C:\Users\BIT\Documents\flutter_projects\ieee_megaproject\.dart_tool\package_config.json C:/src/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\BIT\DOCUMENTS\FLUTTER_PROJECTS\IEEE_MEGAPROJECT\BUILD\WINDOWS\X64\CMAKEFILES\365DC21DB621EB0EB610C59BBFBB27E3\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\BIT\DOCUMENTS\FLUTTER_PROJECTS\IEEE_MEGAPROJECT\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/BIT/Documents/flutter_projects/ieee_megaproject/windows -BC:/Users/BIT/Documents/flutter_projects/ieee_megaproject/build/windows/x64 --check-stamp-file C:/Users/BIT/Documents/flutter_projects/ieee_megaproject/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
