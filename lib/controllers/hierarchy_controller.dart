@@ -75,9 +75,9 @@ class HierarchyController extends GetxController {
         break;
 
       case 'Image':
-        newNode.width.value = 150;
-        newNode.height.value = 150;
-        newNode.content.value = 'assets/placeholder.png';
+        newNode.width.value = 200; // Updated default width
+        newNode.height.value = 200; // Updated default height
+        newNode.content.value = '';
         newNode.borderRadius.value = 8.0;
         break;
 

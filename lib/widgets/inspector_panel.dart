@@ -58,8 +58,12 @@ class _InspectorPanelState extends State<InspectorPanel> {
           child: Text('Widget Properties',
               style: TextStyle(fontWeight: FontWeight.bold)),
         ),
-        if (node.type == 'Container') ...[
+        if (node.type == 'Container' ||
+            node.type == 'Image' ||
+            node.type == 'TextField') ...[
           _buildNumberInput(node),
+        ],
+        if (node.type == 'Container') ...[
           _buildColorInput(node),
         ] else if (node.type == 'Text') ...[
           _buildTextInput(node),
@@ -117,6 +121,7 @@ class _InspectorPanelState extends State<InspectorPanel> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildNumberInput(node),
               const Text('Image', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 8),
               Container(
