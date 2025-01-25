@@ -10,56 +10,179 @@ class HierarchyPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Hierarchy', style: TextStyle(fontSize: 16)),
-        ),
-        const Divider(),
-        Row(
+        Column(
           children: [
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.add),
-              itemBuilder: (context) => controller.availableWidgets
-                  .map((type) => PopupMenuItem(
-                        value: type,
-                        child: Text(type),
-                      ))
-                  .toList(),
-              onSelected: (type) => controller.addNode(type),
+            Container(
+              height: 40,
+              padding: const EdgeInsets.all(8.0),
+              child: const Text('Hierarchy', style: TextStyle(fontSize: 16)),
             ),
-            Obx(() => controller.selected.value != null
-                ? PopupMenuButton<String>(
-                    icon: const Icon(Icons.add_circle_outline),
-                    tooltip: 'Add child',
-                    itemBuilder: (context) => controller.availableWidgets
-                        .map((type) => PopupMenuItem(
-                              value: type,
-                              child: Text(type),
-                            ))
-                        .toList(),
-                    onSelected: (type) => controller.addChildToSelected(type),
-                  )
-                : const SizedBox()),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                if (controller.selected.value != null) {
-                  controller.deleteNode(controller.selected.value!.id);
-                }
-              },
+            const Divider(),
+            _buildToolbar(),
+            Expanded(
+              child: Obx(
+                () => ListView.builder(
+                  itemCount: controller.nodes.length,
+                  itemBuilder: (context, index) {
+                    return _buildNodeTree(controller.nodes[index]);
+                  },
+                ),
+              ),
             ),
           ],
         ),
-        Expanded(
-          child: Obx(
-            () => ListView.builder(
-              itemCount: controller.nodes.length,
-              itemBuilder: (context, index) {
-                return _buildNodeTree(controller.nodes[index]);
-              },
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: _buildPositioningControls(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolbar() {
+    return Row(
+      children: [
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.add),
+          itemBuilder: (context) => controller.availableWidgets
+              .map((type) => PopupMenuItem(
+                    value: type,
+                    child: Text(type),
+                  ))
+              .toList(),
+          onSelected: (type) => controller.addNode(type),
+        ),
+        Obx(() => controller.selected.value != null
+            ? PopupMenuButton<String>(
+                icon: const Icon(Icons.add_circle_outline),
+                tooltip: 'Add child',
+                itemBuilder: (context) => controller.availableWidgets
+                    .map((type) => PopupMenuItem(
+                          value: type,
+                          child: Text(type),
+                        ))
+                    .toList(),
+                onSelected: (type) => controller.addChildToSelected(type),
+              )
+            : const SizedBox()),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            if (controller.selected.value != null) {
+              controller.deleteNode(controller.selected.value!.id);
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPositioningControls() {
+    return Obx(() => controller.selected.value != null
+        ? Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey[850],
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildPositionRow(
+                  'X',
+                  controller.selected.value!.x.value,
+                  (value) => controller.updateNodePosition(
+                    controller.selected.value!,
+                    value,
+                    controller.selected.value!.y.value,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildPositionRow(
+                  'Y',
+                  controller.selected.value!.y.value,
+                  (value) => controller.updateNodePosition(
+                    controller.selected.value!,
+                    controller.selected.value!.x.value,
+                    value,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.align_horizontal_left, size: 20),
+                      onPressed: () =>
+                          controller.alignSelected(Alignment.centerLeft),
+                      tooltip: 'Align Left',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.align_horizontal_center, size: 20),
+                      onPressed: () =>
+                          controller.alignSelected(Alignment.center),
+                      tooltip: 'Center',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.align_horizontal_right, size: 20),
+                      onPressed: () =>
+                          controller.alignSelected(Alignment.centerRight),
+                      tooltip: 'Align Right',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        : const SizedBox());
+  }
+
+  Widget _buildPositionRow(
+      String label, double value, Function(double) onChanged) {
+    final controller = TextEditingController(text: value.toStringAsFixed(0));
+
+    // Set initial text
+    controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: controller.text.length),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 20,
+          child: Text(label, style: const TextStyle(fontSize: 12)),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 100,
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+            ),
+            style: const TextStyle(fontSize: 12),
+            keyboardType: TextInputType.number,
+            onChanged: (value) {
+              final parsed = double.tryParse(value);
+              if (parsed != null) {
+                onChanged(parsed);
+              }
+            },
           ),
         ),
       ],

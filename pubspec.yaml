@@ -39,6 +39,7 @@ dependencies:
   uuid: ^3.0.7
   analyzer: ^6.7.0
   dart_style: ^2.3.4
+  file_picker: ^5.3.1
 
 dev_dependencies:
   flutter_test:

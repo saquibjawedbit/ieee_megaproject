@@ -26,7 +26,7 @@ class CanvasRenderer extends StatelessWidget {
               icon: const Icon(Icons.code),
               tooltip: 'Generate Code',
               onPressed: () {
-                final code = CodeGenerator.generate(controller.nodes);
+                final code = CodeGenerator.generateCode(controller.nodes);
                 Clipboard.setData(ClipboardData(text: code));
                 Get.snackbar(
                   'Success',
@@ -107,7 +107,6 @@ class CanvasRenderer extends StatelessWidget {
   Widget _renderWidget(WidgetNode node) {
     Widget child;
     try {
-      // Use AST renderer
       child = AstRenderer.renderFromNode(node);
     } catch (e) {
       debugPrint('Error rendering widget: $e');
@@ -117,6 +116,8 @@ class CanvasRenderer extends StatelessWidget {
     return Positioned(
       left: node.x.value,
       top: node.y.value,
+      width: node.width.value, // Add explicit width
+      height: node.height.value, // Add explicit height
       child: MouseRegion(
         cursor: SystemMouseCursors.move,
         child: GestureDetector(
@@ -148,8 +149,10 @@ class CanvasRenderer extends StatelessWidget {
 
   Widget _buildSelectionOverlay(WidgetNode node) {
     return Positioned(
-      left: node.x.value,
-      top: node.y.value,
+      left: node.x.value - 2, // Offset for border
+      top: node.y.value - 2, // Offset for border
+      width: node.width.value + 4, // Add border width
+      height: node.height.value + 4, // Add border height
       child: IgnorePointer(
         child: Container(
           decoration: BoxDecoration(

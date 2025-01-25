@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../controllers/hierarchy_controller.dart';
 import '../models/widget_node.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class InspectorPanel extends StatefulWidget {
   const InspectorPanel({super.key});
@@ -64,7 +66,274 @@ class _InspectorPanelState extends State<InspectorPanel> {
         ] else if (node.type == 'Row' || node.type == 'Column') ...[
           _buildAlignmentInputs(node),
         ],
+        // Add border radius control for supported widgets
+        if (['Container', 'Button', 'Image'].contains(node.type))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('Border Radius', style: TextStyle(fontSize: 12)),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: node.borderRadius.value,
+                      min: 0,
+                      max: 32,
+                      divisions: 32,
+                      label: node.borderRadius.value.toStringAsFixed(1),
+                      onChanged: (value) =>
+                          controller.updateBorderRadius(node, value),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50,
+                    child: TextField(
+                      controller: TextEditingController(
+                          text: node.borderRadius.value.toStringAsFixed(1)),
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      ),
+                      style: const TextStyle(fontSize: 12),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        final radius = double.tryParse(value);
+                        if (radius != null) {
+                          controller.updateBorderRadius(node, radius);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        if (node.type == 'Image') ...[
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Image', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                height: 120,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[700]!),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (node.content.value.isNotEmpty) _buildImagePreview(node),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => controller.pickAndUpdateImage(node),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                node.content.value.isEmpty
+                                    ? Icons.add_photo_alternate
+                                    : Icons.edit,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                node.content.value.isEmpty
+                                    ? 'Upload Image'
+                                    : 'Change Image',
+                                style: TextStyle(color: Colors.grey[400]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (node.type == 'Button') ...[
+          _buildNumberInput(node),
+          _buildTextField('Button Text', node.content.value, (value) {
+            controller.updateTextContent(node, value);
+          }),
+          GetBuilder<HierarchyController>(
+            builder: (controller) => _buildNumberField(
+              'Font size',
+              node.fontSize.value.toString(),
+              (newValue) {
+                if (newValue.isNotEmpty) {
+                  final value = double.tryParse(newValue);
+                  if (value != null) {
+                    controller.updateFontSize(node, value);
+                  }
+                }
+              },
+            ),
+          ),
+          GetBuilder<HierarchyController>(
+            builder: (controller) => _buildDropdown(
+              'Font Weight',
+              _getFontWeightValue(node.fontWeight.value),
+              {
+                'w100': FontWeight.w100,
+                'w200': FontWeight.w200,
+                'w300': FontWeight.w300,
+                'w400': FontWeight.w400,
+                'w500': FontWeight.w500,
+                'w600': FontWeight.w600,
+                'w700': FontWeight.w700,
+                'w800': FontWeight.w800,
+                'w900': FontWeight.w900,
+                'normal': FontWeight.normal,
+                'bold': FontWeight.bold,
+              }.keys.toList(),
+              (newValue) {
+                if (newValue != null) {
+                  final weightMap = {
+                    'w100': FontWeight.w100,
+                    'w200': FontWeight.w200,
+                    'w300': FontWeight.w300,
+                    'w400': FontWeight.w400,
+                    'w500': FontWeight.w500,
+                    'w600': FontWeight.w600,
+                    'w700': FontWeight.w700,
+                    'w800': FontWeight.w800,
+                    'w900': FontWeight.w900,
+                    'normal': FontWeight.normal,
+                    'bold': FontWeight.bold,
+                  };
+                  final weight = weightMap[newValue] ?? FontWeight.normal;
+                  controller.updateFontWeight(node, weight);
+                }
+              },
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GetBuilder<HierarchyController>(
+                builder: (controller) => _buildColorPicker(
+                  'Background Color',
+                  node.color.value,
+                  (newColor) => controller.updateNodeColor(node, newColor),
+                ),
+              ),
+              const SizedBox(height: 8),
+              GetBuilder<HierarchyController>(
+                builder: (controller) => _buildColorPicker(
+                  'Text Color',
+                  node.textColor.value,
+                  (newColor) => controller.updateTextColor(node, newColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Padding', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildNumberField(
+                      'Left',
+                      node.padding.value.left.toString(),
+                      (value) {
+                        final padding = node.padding.value;
+                        node.padding.value = EdgeInsets.only(
+                          left: double.tryParse(value) ?? padding.left,
+                          top: padding.top,
+                          right: padding.right,
+                          bottom: padding.bottom,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildNumberField(
+                      'Top',
+                      node.padding.value.top.toString(),
+                      (value) {
+                        final padding = node.padding.value;
+                        node.padding.value = EdgeInsets.only(
+                          left: padding.left,
+                          top: double.tryParse(value) ?? padding.top,
+                          right: padding.right,
+                          bottom: padding.bottom,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildNumberField(
+                      'Right',
+                      node.padding.value.right.toString(),
+                      (value) {
+                        final padding = node.padding.value;
+                        node.padding.value = EdgeInsets.only(
+                          left: padding.left,
+                          top: padding.top,
+                          right: double.tryParse(value) ?? padding.right,
+                          bottom: padding.bottom,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildNumberField(
+                      'Bottom',
+                      node.padding.value.bottom.toString(),
+                      (value) {
+                        final padding = node.padding.value;
+                        node.padding.value = EdgeInsets.only(
+                          left: padding.left,
+                          top: padding.top,
+                          right: padding.right,
+                          bottom: double.tryParse(value) ?? padding.bottom,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ],
+    );
+  }
+
+  Widget _buildImagePreview(WidgetNode node) {
+    if (node.content.value.isEmpty) {
+      return const Icon(Icons.broken_image, color: Colors.grey);
+    }
+
+    return Image.network(
+      node.content.value,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) =>
+          const Icon(Icons.broken_image, color: Colors.grey),
     );
   }
 
